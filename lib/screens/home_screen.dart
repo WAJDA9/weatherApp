@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:lottie/lottie.dart';
 import 'package:http/http.dart' as http;
+import 'package:weatherapp/models/weather.dart';
+import 'package:weatherapp/repository/weather_repository.dart';
 
 class WeatherHomePage extends StatefulWidget {
   const WeatherHomePage({super.key});
@@ -15,8 +17,7 @@ class WeatherHomePage extends StatefulWidget {
 
 class _WeatherHomePageState extends State<WeatherHomePage> {
   final AudioPlayer _audioPlayer = AudioPlayer();
-  String temprature = "";
-  String weather = "";
+  Weather weatherInfo = Weather();
   @override
   void initState() {
     getData();
@@ -25,14 +26,15 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
   }
 
   void getData() async {
-    Response response = await http.get(Uri.parse(
-        "http://api.weatherapi.com/v1/current.json?key=ef5102bfd8104f07a7e21736240612&q=Sousse"));
-    var data = jsonDecode(response.body);
-    setState(() {
-      temprature = data['current']['temp_c'].toString();
-      weather = data['current']['condition']['text'].toString();
-    });
-    print(temprature);
+    
+   try {
+     weatherInfo = await WeatherRepository().fetchWeather('sousse');
+   }
+   on Exception catch (e) {
+       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+         content: Text('Failed to load weather:}'),
+       ));
+   }
   }
 
   void _playBackgroundSound() async {
@@ -75,7 +77,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    "Current Weather: $weather",
+                    "Current Weather: ${weatherInfo.current!.condition!.text!}",
                     style: Theme.of(context)
                         .textTheme
                         .bodyLarge!
@@ -83,7 +85,7 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    "Temperature: ${temprature}°C",
+                    "Temperature: ${weatherInfo.current!.tempC}°C",
                     style: Theme.of(context)
                         .textTheme
                         .bodyLarge!

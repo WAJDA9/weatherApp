@@ -1,9 +1,5 @@
-import 'dart:io';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:lottie/lottie.dart';
 import 'package:weatherapp/screens/home_screen.dart';
 
 void main() {
